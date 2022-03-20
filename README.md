@@ -21,4 +21,4 @@ python -m pip install -r requirements.txt
 
     Write a greedy algorithm to solve the minimum dominating set problem.
 
-    ![result](hw1_MinDomSet\result0.jpg)
+    ![result](hw1_MinDomSet/result0.jpg)
