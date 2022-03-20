@@ -77,7 +77,7 @@ class MinDominatingSet():
         '''
         计算理论上的最小支配集上界
         '''
-        self.theoretical_min_dom_set_size = round(self.n*(1+math.log(self.delta+1))/(self.delta+1), 2)
+        self.theoretical_min_dom_set_size = math.floor(self.n*(1+math.log(self.delta+1))/(self.delta+1))
         return self.theoretical_min_dom_set_size
 
     def draw_graph(self):
