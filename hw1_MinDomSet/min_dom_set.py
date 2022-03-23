@@ -50,7 +50,7 @@ class MinDominatingSet():
             print("vertice", min_degree_node, "has min degree", min_degree, ".")
         return G
 
-    def find_min_dom_set(self, method = 1, verification = True):
+    def find_min_dom_set(self, method = 1, verification = False):
         '''
         贪心算法寻找最小支配集
         method: 0 每次找剩余最大度节点; 1 每次找最大收益节点
@@ -105,7 +105,7 @@ class MinDominatingSet():
         self.theoretical_min_dom_set_size = math.floor(self.n*(1+math.log(self.delta+1))/(self.delta+1))
         return self.theoretical_min_dom_set_size
 
-    def draw_graph(self):
+    def draw_graph(self, label = 0, legend = 1):
         '''
         画图, 同时给支配集染上不同颜色
         '''
@@ -118,21 +118,21 @@ class MinDominatingSet():
                 with_labels=True,
                 font_weight='bold')
         
-        # 标注框
-        textstr = '\n'.join((
-            r'n: %d'%self.n,
-            r'$\delta$: %d'%self.delta,
-            r'p: %.2f'%self.p,
-            r'practical result: %d'%len(self.min_dom_set),
-            r'theoretical result: %d'%self.theoretical_min_dom_set_size))
-        props = dict(boxstyle='round', facecolor='white', alpha=0.5)
-        ax.text(0.0, 0.2, textstr, transform=ax.transAxes, fontsize=10,
-            verticalalignment='top', bbox=props)    
+        if label ==1:  # 标注框
+            textstr = '\n'.join((
+                r'n: %d'%self.n,
+                r'$\delta$: %d'%self.delta,
+                r'p: %.2f'%self.p,
+                r'practical result: %d'%len(self.min_dom_set),
+                r'theoretical result: %d'%self.theoretical_min_dom_set_size))
+            props = dict(boxstyle='round', facecolor='white', alpha=0.5)
+            ax.text(0.0, 0.2, textstr, transform=ax.transAxes, fontsize=10,
+                verticalalignment='top', bbox=props)    
         
-        # 图例
-        patch1 = mpatches.Patch(color='gold', label='Dominating Set')
-        patch2 = mpatches.Patch(color='lightblue', label='Other Vertices')
-        plt.legend(handles=[patch1, patch2])
+        if legend == 1:  # 图例
+            patch1 = mpatches.Patch(color='gold', label='Dominating Set')
+            patch2 = mpatches.Patch(color='lightblue', label='Other Vertices')
+            plt.legend(handles=[patch1, patch2])
         return plt
 
 
@@ -153,5 +153,5 @@ if __name__ == '__main__':
     print("Theoretically it has at most", MDS.theoretical_min_dom_set_size, "vertices.")
 
     # 画图
-    plt = MDS.draw_graph()
+    plt = MDS.draw_graph(label = 1)
     plt.show()

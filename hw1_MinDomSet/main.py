@@ -13,7 +13,7 @@ if __name__ == '__main__':
     for i in range(20):
         # 生成随机图
         n = random.randint(5,50)  # 定义顶点数量
-        delta = random.randint(5,n)  # 最小度
+        delta = random.randint(1,int(n/2))  # 最小度
         probability = 0.1  # 图中边连接概率
         MDS = MinDominatingSet(n, delta, probability)
 
