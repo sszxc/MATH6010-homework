@@ -75,7 +75,8 @@ class MinDominatingSet():
             undominated_neighbors = {}                  # 为每个可选点维护未被支配的邻居dict，换句话说，选择某个点能带来的收益
             for i in range(self.n):
                 undominated_neighbors[i] = list(self.graph.adj[i].keys())
-                
+            
+            # 找到最大收益点
             while len(undominated_set):
                 max_gain = 0
                 max_gain_node = None
@@ -83,12 +84,20 @@ class MinDominatingSet():
                     if len(undominated_neighbors[i]) > max_gain:  # 找最大收益
                         max_gain = len(undominated_neighbors[i])
                         max_gain_node = i
-                # 更新剩余集合
+
+                # 更新 dominating_set
                 dominating_set.append(max_gain_node)
+                # 更新 undominated_neighbors
                 undominated_neighbors.pop(max_gain_node)
+                for j in [*list(self.graph.adj[max_gain_node]),max_gain_node]:
+                    for i in undominated_neighbors:
+                        if j in undominated_neighbors[i]:
+                            undominated_neighbors[i].remove(j)
+                # 更新 undominated_set
                 if max_gain_node in undominated_set:
                     undominated_set.remove(max_gain_node)
-                undominated_set =[node for node in undominated_set if node not in list(self.graph.adj[max_gain_node])]  # 删掉对应点的邻居
+                undominated_set =[node for node in undominated_set if node not in list(self.graph.adj[max_gain_node])]
+
         print("Dominating set found!")
         self.min_dom_set = dominating_set
 
