@@ -2,6 +2,7 @@
 # Date: March 20th, 2022
 # Description: Greedy Algorithm for Min Dominating Set
 
+from re import M
 from matplotlib import colors
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -10,7 +11,7 @@ import random
 import math
 
 class MinDominatingSet():
-    def __init__(self, n, delta, p):
+    def __init__(self, n, delta, p=0.1):
         print("n:", n, "delta:", delta, "p:", p)
         self.n = n
         self.delta = delta
@@ -21,7 +22,6 @@ class MinDominatingSet():
     def random_graph_with_min_degree(self, n, delta, p, verification = False):
         """
         生成一个n节点图, 所有边连接概率为p, 同时保证节点最小度delta
-        modified from https://stackoverflow.com/questions/61958360/how-to-create-random-graph-where-each-node-has-at-least-1-edge-using-networkx
         """
         G = nx.Graph()
         G.add_nodes_from(range(n))
@@ -50,26 +50,51 @@ class MinDominatingSet():
             print("vertice", min_degree_node, "has min degree", min_degree, ".")
         return G
 
-    def find_min_dom_set(self, verification = False):
-        remaining_set = list(self.graph.nodes)
-        dominating_set = []
-        while len(remaining_set):
-            max_degree = 0
-            max_degree_node = None
-            for i in remaining_set:
-                if self.graph.degree(i) > max_degree:  # 找最大度
-                    max_degree = self.graph.degree(i)
-                    max_degree_node = i
-            # 更新剩余集合
-            dominating_set.append(max_degree_node)
-            remaining_set.remove(max_degree_node)
-            remaining_set =[node for node in remaining_set if node not in list(self.graph.adj[max_degree_node])]
+    def find_min_dom_set(self, method = 1, verification = True):
+        '''
+        贪心算法寻找最小支配集
+        method: 0 每次找剩余最大度节点; 1 每次找最大收益节点
+        '''
+        if method == 0:
+            remaining_set = list(self.graph.nodes)
+            dominating_set = []
+            while len(remaining_set):
+                max_degree = 0
+                max_degree_node = None
+                for i in remaining_set:
+                    if self.graph.degree(i) > max_degree:  # 找最大度
+                        max_degree = self.graph.degree(i)
+                        max_degree_node = i
+                # 更新剩余集合
+                dominating_set.append(max_degree_node)
+                remaining_set.remove(max_degree_node)
+                remaining_set =[node for node in remaining_set if node not in list(self.graph.adj[max_degree_node])]  # 删掉对应点的邻居
+        elif method == 1:
+            dominating_set = []                         # 支配集
+            undominated_set = list(self.graph.nodes)    # 未被支配的点
+            undominated_neighbors = {}                  # 为每个可选点维护未被支配的邻居dict，换句话说，选择某个点能带来的收益
+            for i in range(self.n):
+                undominated_neighbors[i] = list(self.graph.adj[i].keys())
+                
+            while len(undominated_set):
+                max_gain = 0
+                max_gain_node = None
+                for i in undominated_neighbors:
+                    if len(undominated_neighbors[i]) > max_gain:  # 找最大收益
+                        max_gain = len(undominated_neighbors[i])
+                        max_gain_node = i
+                # 更新剩余集合
+                dominating_set.append(max_gain_node)
+                undominated_neighbors.pop(max_gain_node)
+                if max_gain_node in undominated_set:
+                    undominated_set.remove(max_gain_node)
+                undominated_set =[node for node in undominated_set if node not in list(self.graph.adj[max_gain_node])]  # 删掉对应点的邻居
         print("Dominating set found!")
         self.min_dom_set = dominating_set
 
         if verification:
             # networkx函数验证是否支配
-            print("Dominating verification:", nx.algorithms.is_dominating_set(MDS.graph, MDS.min_dom_set))
+            print("Dominating verification:", nx.algorithms.is_dominating_set(self.graph, self.min_dom_set))
     
         return self.min_dom_set
 
@@ -115,7 +140,7 @@ if __name__ == '__main__':
     print("------------------------------------------------")
     
     # 生成随机图
-    n = random.randint(5,20)  # 定义顶点数量
+    n = 5  # 定义顶点数量
     delta = 2  # 最小度
     probability = 0.1  # 图中边连接概率
     MDS = MinDominatingSet(n, delta, probability)
