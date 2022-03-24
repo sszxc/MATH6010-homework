@@ -41,14 +41,14 @@ if __name__ == '__main__':
     test_result = []
     test_result2 = []
     theory_result = []
-    for n in range(delta + 1, delta * 100 + 1):  # 改变顶点数
+    for n in range(delta + 1, delta + 201):  # 改变顶点数
         MDS = MinDominatingSet(n, delta, probability)
         MDS.find_min_dom_set(0)
         test_result.append(len(MDS.min_dom_set))
         MDS.find_min_dom_set(1)
         test_result2.append(len(MDS.min_dom_set))
         theory_result.append(MDS.theoretical_min_dom_set_size)
-    x = [i for i in range(delta + 1, delta * 100 + 1)]  # 横坐标
+    x = [i for i in range(delta + 1, delta + 201)]  # 横坐标
     l1 = plt.plot(x, test_result, 'r', label='Greedy Algorithm')
     l2 = plt.plot(x, test_result2, 'g', label='Better Greedy Algorithm')
     l3 = plt.plot(x, theory_result, 'b', label='Theoretical Size')
