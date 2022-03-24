@@ -2,7 +2,6 @@
 # Date: March 20th, 2022
 # Description: Greedy Algorithm for Min Dominating Set
 
-from re import M
 from matplotlib import colors
 import networkx as nx
 import matplotlib.pyplot as plt
