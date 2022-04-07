@@ -19,6 +19,12 @@ python -m pip install -r requirements.txt
 
     > Theorem: Let $G=(V,E)$ be a graph on $n$ vertices, with minimum degree $\delta>1$. Then $G$ has a dominating set of at most $n[1+\ln(\delta+1)]/(\delta+1)$ vertices.
 
-    Write a greedy algorithm to solve the minimum dominating set problem.
+    Write a greedy algorithm to find a dominating set that satisfies the theorem.
 
-    ![result](hw1_MinDomSet/result0.jpg)
+    ![result](hw1_MinDomSet/demo.jpg)
+
+2. Monochromatic K4
+   
+    > Theorem: There is a two-coloring of $K_n$ with at most $C_n^4 2^{-5}$ monochromatic K4.
+
+    Write a greedy algorithm to find a method of coloring the edges that satisfies the theorem.
