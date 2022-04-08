@@ -157,8 +157,10 @@ if __name__ == '__main__':
     print("------------------------------------------------")
 
     random.seed(777)
-    MK4 = MonochromaticK4(8, 0.7)
-    # MK4 = MonochromaticK4(50, 0.5)
+    # MK4 = MonochromaticK4(8, 0.7)
+    MK4 = MonochromaticK4(200, 1)
+
     MK4.coloring()
-    MK4.draw_graph(label = 1, legend = 1)
+
+    MK4.draw_graph(label = False, legend = False)
     plt.show()
