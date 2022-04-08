@@ -162,5 +162,5 @@ if __name__ == '__main__':
 
     MK4.coloring()
 
-    MK4.draw_graph(label = False, legend = False)
+    MK4.draw_graph(label = False, legend = False)  #TODO: 设计一下可视化方式, 包括但不限于调整配色、单独展示K4、染色顺序等
     plt.show()
