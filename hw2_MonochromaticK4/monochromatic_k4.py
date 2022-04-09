@@ -55,8 +55,8 @@ class MonochromaticK4():
     def find_K4(self):
         '''
         寻找4顶点完全子图
-        '''        
-        cliques = list(nx.find_cliques(self.graph))
+        '''
+        cliques = list(nx.enumerate_all_cliques(self.graph))
         K4 = [c for c in cliques if len(c) == 4]
         K4_dict = {}
         for i in range(len(K4)):
@@ -157,8 +157,9 @@ if __name__ == '__main__':
     print("------------------------------------------------")
 
     random.seed(777)
-    # MK4 = MonochromaticK4(8, 0.7)
-    MK4 = MonochromaticK4(200, 1)
+    #TODO: 直接生成完全图
+    # MK4 = MonochromaticK4(8, 1)
+    MK4 = MonochromaticK4(10, 1)
 
     MK4.coloring()
 
