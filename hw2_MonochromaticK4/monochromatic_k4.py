@@ -112,7 +112,7 @@ class MonochromaticK4():
                         return 0
             if count == 0: 
                 count = 1  # 已染0条边与1条边的Ik相同
-            return 2**-count
+            return 2**-(6-count)
 
         self.color_sequence = list(self.graph.edges)  # (伪随机的)染色顺序
 
