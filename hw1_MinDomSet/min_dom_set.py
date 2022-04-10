@@ -3,6 +3,7 @@
 # Description: Greedy Algorithm for Min Dominating Set
 
 from matplotlib import colors
+from func_timer import timeit
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -17,7 +18,8 @@ class MinDominatingSet():
         self.p = p
         self.graph = self.random_graph_with_min_degree(self.n, self.delta, self.p)
         self.theoretical_min_dom_set_bound()
-
+    
+    @timeit
     def random_graph_with_min_degree(self, n, delta, p, verification = False):
         """
         生成一个n节点图, 所有边连接概率为p, 同时保证节点最小度delta
@@ -49,6 +51,7 @@ class MinDominatingSet():
             print("vertice", min_degree_node, "has min degree", min_degree, ".")
         return G
 
+    @timeit
     def find_min_dom_set(self, method = 1, verification = False):
         '''
         贪心算法寻找最小支配集
