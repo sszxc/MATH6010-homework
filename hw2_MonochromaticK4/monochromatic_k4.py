@@ -15,9 +15,9 @@ import math
 class MonochromaticK4():
     def __init__(self, nodes, probability):
         '''
-        定义图, 初始化数据结构
+        定义完全图, 初始化数据结构
         '''
-        self.graph = self.random_graph_with_min_degree(nodes, probability)  # 随机连通图
+        self.graph = nx.complete_graph(nodes)
 
         # --- K4 字典 ---
         # {K4id: [[K4顶点], 异色状态]}
@@ -101,7 +101,7 @@ class MonochromaticK4():
                 reward -= update_Ik(colors)  # 染色前
                 colors.append(color)  # 被染色的边原来肯定是 None, 这里直接 append 就行
                 reward += update_Ik(colors)  # 染色后
-                # TODO: Ik写进K4属性
+                # TODO: Ik写进K4属性或许能加速？
             return reward
 
         def update_Ik(colors):
@@ -179,8 +179,6 @@ if __name__ == '__main__':
     print("------------------------------------------------")
 
     random.seed(777)
-    # TODO: 直接生成完全图
-    # MK4 = MonochromaticK4(8, 1)
     node = 50  # 生成顶点数
     MK4 = MonochromaticK4(node, 1)
 
