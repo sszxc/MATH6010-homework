@@ -29,7 +29,7 @@ class MonochromaticK4():
 
         # --- 边 属性 ---
         # 边: {related_K4: [相关K4id], color: [颜色]}
-        nx.set_edge_attributes(self.graph, None, "related_K4")  # 为边添加“相关的K4”属性  #TODO: 在这里赋空列表会造成浅拷贝
+        nx.set_edge_attributes(self.graph, None, "related_K4")  # 为边添加“相关的K4”属性
         nx.set_edge_attributes(self.graph, "None", "color")  # 为边添加“颜色”属性
         for e1, e2 in self.graph.edges:
             self.graph[e1][e2]['related_K4'] = []  # 赋初始空列表
