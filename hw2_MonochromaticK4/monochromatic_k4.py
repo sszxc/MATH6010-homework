@@ -2,14 +2,13 @@
 # Date: April 8th, 2022
 # Description: Greedy Algorithm for Monochromatic K4
 
-from matplotlib import colors
-import networkx as nx
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
+import math
 import random
 import itertools
+import networkx as nx
 from tqdm import tqdm
-import math
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 
 class MonochromaticK4():
@@ -35,36 +34,10 @@ class MonochromaticK4():
             self.graph[e1][e2]['related_K4'] = []  # 赋初始空列表
         self.find_related_K4()
 
-    def random_graph_with_min_degree(self, n, p, delta=1):
-        """
-        生成一个n节点图, 所有边连接概率为p, 同时保证节点最小度delta
-        """
-        G = nx.Graph()
-        G.add_nodes_from(range(n))
-        if p >= 1 or delta >= n - 1:
-            return nx.complete_graph(n, create_using=G)
-
-        for i in range(n):
-            node_nodes = range(i + 1, n)
-            random_edges = [j for j in node_nodes if random.random() < p]  # 按概率连接(所有边组合只会在此出现一次)
-            G.add_edges_from([(i, j) for j in random_edges])
-
-            if G.degree(i) < delta:  # 最小度约束
-                remaining_nodes = [j for j in list(G.nodes) if j not in list(G.adj[i]) and i != j]  # 在剩余所有可选点中选择
-                necessary_edges = random.sample(remaining_nodes, delta - G.degree(i))
-                G.add_edges_from([(i, j) for j in necessary_edges])
-        return G
-
     def find_K4(self):
         '''
         寻找4顶点完全子图
         '''
-        # cliques = list(nx.enumerate_all_cliques(self.graph))
-        # K4 = [c for c in cliques if len(c) == 4]
-        # K4_dict = {}
-        # for i in range(len(K4)):
-        #     K4_dict[i] = [K4[i], 0]
-        # return K4_dict
         K4 = [c for c in itertools.combinations(list(self.graph.nodes), 4)]
         K4_dict = {}
         for i in range(len(K4)):
@@ -78,17 +51,14 @@ class MonochromaticK4():
         for i in range(len(self.K4_dict)):
             nodes = self.K4_dict[i][0]
             for e1, e2 in itertools.combinations(nodes, 2):
-                target = self.graph[e1][e2]  # TODO: target不能指向字典的key
-                target['related_K4'].append(i)
+                target = self.graph[e1][e2]['related_K4']
+                target.append(i)
+                
 
     def coloring(self):
         '''
         一种启发式染色算法
         '''
-
-        def random_color():
-            return random.choice(['black', 'white'])
-
         def update_W(self, e1, e2, color):
             '''
             计算染色 (e1, e2) 为 color 在全局的收益
@@ -187,9 +157,7 @@ if __name__ == '__main__':
     MK4.draw_graph(label=False, legend=False)  # TODO: 设计一下可视化方式, 包括但不限于调整配色、单独展示K4、染色顺序等
     plt.show()
 
-    '''
-    计算期望值并于实验结果比较
-    '''
+    # 计算期望值并与实验结果比较
     expect_value = math.comb(node, 4) * (2 ** -5)
     sum = MK4.compute_k4()
     print('expect_value = ', expect_value, '\nsum = ', sum)
