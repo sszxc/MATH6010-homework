@@ -9,17 +9,17 @@ import networkx as nx
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-
+from datetime import datetime
 
 class MonochromaticK4():
-    def __init__(self, nodes, probability):
+    def __init__(self, nodes):
         '''
         定义完全图, 初始化数据结构
         '''
         self.graph = nx.complete_graph(nodes)
 
         # --- K4 字典 ---
-        # {K4id: [[K4顶点], 异色状态]}
+        # {K4id: [[K4顶点], I_k, 已选颜色]}
         # 异色状态: 0: 未支配, 1: 支配
         # |状态|  0 |  1 |  2 |  3 |  4 |  5 |  6 |  -1 |
         # |已染|  0 |  1 |  2 |  3 |  4 |  5 |  6 |异色边|
@@ -41,7 +41,7 @@ class MonochromaticK4():
         K4 = [c for c in itertools.combinations(list(self.graph.nodes), 4)]
         K4_dict = {}
         for i in range(len(K4)):
-            K4_dict[i] = [K4[i], 0]
+            K4_dict[i] = [K4[i], 2 ** -5, None]  # 初始染色0条 未定颜色
         return K4_dict
 
     def find_related_K4(self):
@@ -53,11 +53,10 @@ class MonochromaticK4():
             for e1, e2 in itertools.combinations(nodes, 2):
                 target = self.graph[e1][e2]['related_K4']
                 target.append(i)
-                
 
     def coloring(self):
         '''
-        一种启发式染色算法
+        一种染色算法
         '''
         def update_W(self, e1, e2, color):
             '''
@@ -66,39 +65,39 @@ class MonochromaticK4():
             reward = 0
             for k in self.graph[e1][e2]['related_K4']:
                 # 计算染色 (e1, e2) 为 color 在 k 中的收益
-                colors = [self.graph[e1][e2]['color']
-                          for e1, e2 in itertools.combinations(self.K4_dict[k][0], 2)]
-                reward -= update_Ik(colors)  # 染色前
-                colors.append(color)  # 被染色的边原来肯定是 None, 这里直接 append 就行
-                reward += update_Ik(colors)  # 染色后
-                # TODO: Ik写进K4属性或许能加速？
+                if self.K4_dict[k][2] == None:  # 未染色
+                    reward += 0
+                else:
+                    if color == self.K4_dict[k][2]:  # 同色
+                        reward += self.K4_dict[k][1]
+                    else:  # 异色
+                        reward += 0
             return reward
 
-        def update_Ik(colors):
+        def color_edge(e1, e2, color):
             '''
-            根据六条边的颜色计算 Ik
+            染色 (e1, e2) 为 color, 同时更新相关K4的染色状态
             '''
-            count = 0
-            target_color = 'None'
-            for color in colors:
-                if color != 'None':
-                    if target_color == 'None':  # 第一个有色边
-                        target_color = color
-                        count += 1
-                    elif color == target_color:  # 同色边
-                        count += 1
-                    else:  # 异色边
-                        return 0
-            if count == 0:
-                count = 1  # 已染0条边与1条边的Ik相同
-            return 2 ** - (6 - count)
+            self.graph[e1][e2]['color'] = color
+            for k in self.graph[e1][e2]['related_K4']:
+                if self.K4_dict[k][2] == None:  # 未染色
+                    self.K4_dict[k][2] = color
+                else:
+                    if color == self.K4_dict[k][2]:  # 同色
+                        self.K4_dict[k][1] *= 2
+                    else:  # 异色
+                        self.K4_dict[k][1] = 0
+                #TODO: 这里有一次“分别计算，选择大的，然后再计算一次并赋值”，是否可以空间换时间？
 
         self.color_sequence = list(self.graph.edges)  # (伪随机的)染色顺序
 
         for e1, e2 in tqdm(self.color_sequence):  # 比较黑白收益 执行染色
             reward_w = update_W(self, e1, e2, "white")
             reward_b = update_W(self, e1, e2, "black")
-            self.graph[e1][e2]['color'] = "white" if reward_w < reward_b else "black"
+            if reward_w < reward_b:
+                color_edge(e1, e2, "white")
+            else:
+                color_edge(e1, e2, "black")
 
     def draw_graph(self, label=False, legend=True):
         '''
