@@ -9,8 +9,6 @@ import networkx as nx
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-from datetime import datetime
-
 class MonochromaticK4():
     def __init__(self, nodes):
         '''
@@ -86,7 +84,6 @@ class MonochromaticK4():
                         self.K4_dict[k][1] *= 2
                     else:  # 异色
                         self.K4_dict[k][1] = 0
-                #TODO: 这里有一次“分别计算，选择大的，然后再计算一次并赋值”，是否可以空间换时间？
 
         self.color_sequence = list(self.graph.edges)  # (伪随机的)染色顺序
 
@@ -148,7 +145,7 @@ if __name__ == '__main__':
 
     random.seed(777)
     node = 50  # 生成顶点数
-    MK4 = MonochromaticK4(node, 1)
+    MK4 = MonochromaticK4(node)
 
     MK4.coloring()
 
