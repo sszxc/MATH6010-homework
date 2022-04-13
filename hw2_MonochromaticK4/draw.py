@@ -10,12 +10,11 @@ import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     os.chdir(sys.path[0])
-    probability = 1  # 图中边连接概率
-    n = 50  # 固定顶点数
+    n = 100  # 固定顶点数
     test_result = []
     theory_result = []
     for i in range(4, n):  # 改变最小度数
-        MK4 = MonochromaticK4(i, 1)
+        MK4 = MonochromaticK4(i)
         MK4.coloring()
         expect_value = math.comb(i, 4) * (2 ** -5)
         sum = MK4.compute_k4()
