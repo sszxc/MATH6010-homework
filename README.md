@@ -57,3 +57,5 @@ The algorithm is specially optimized to take only 23 seconds for a problem of 10
 Design a hill-climbing algorithm to construct random STS(v).
 
 ### Solution
+
+![result](hw3_SteinerTripleSystem/result.jpg)
