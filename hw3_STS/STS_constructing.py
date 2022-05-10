@@ -73,8 +73,8 @@ class STS():
         def find_live_points():
             live_points = []
             for node in hyper_node:
-                if len(graph.adj["node0"]) < (node_num-1)/2:
-                # if len(graph.nodes[node]['neighbors'])-1 < node_num-1:  # 两种等价
+                if len(graph.adj[node]) < (node_num-1)/2:
+                # if len(graph.nodes[node]['neighbors'])-1 < node_num-1:  # 两种写法等价
                     live_points.append(node)
             return live_points
 
@@ -83,14 +83,15 @@ class STS():
             for p, q in list(itertools.combinations(live_points, 2)):
                 if q not in graph.nodes[p]['neighbors']:
                     live_pairs.append((p, q))
-            #TODO: ↓ 这一行需要一个更美写法
+            #TODO: ↓ 这一行需要一个更美写法 (拆开元组)
             all_points = list(set([point[0] for point in live_pairs]
                                 + [point[1] for point in live_pairs]))
             return live_pairs, all_points
 
         def find_live_block(live_pairs, all_points):
+            # 当做图来处理, 寻找3-集团, 但效率非常低
             # G = nx.Graph()
-            # G.add_edges_from(live_pairs) # 当做图来处理 寻找3-集团 TODO: 这样效率会很低
+            # G.add_edges_from(live_pairs)
             # live_blocks = [c for c in nx.enumerate_all_cliques(G) if len(c)==3]
             # return live_blocks
             
@@ -110,37 +111,36 @@ class STS():
             a, b = first_edge
             for c in all_points:
                 if ((a,c) in live_pairs or (c,a) in live_pairs)\
-                    and b!=c:
-                    # 添加 (a,b,c) 删除原来的(x,b,c)
+                    and b!=c:                               # 随意选择可行的 (a,b) 和 (a,c)
                     for edge in [node for node in list(graph.nodes)
                             if node[:4] == 'edge']:
                         if b in list(graph.adj[edge]) and c in list(graph.adj[edge]):
                             l = list(graph.adj[edge])
                             l.remove(b)
                             l.remove(c)                            
-                            graph.remove_edge(edge, l[0])
+                            graph.remove_edge(edge, l[0])   # 删除原来的(x,b,c), 添加 (a,b,c)
                             graph.add_edge(edge, a)
-                        pass
+                            return
 
         count=0
         # 开始构造
         while len(hyper_edge) < node_num*(node_num-1)/6:  # 最优条件
             self.update_nodes_degree(graph)
-            live_points = find_live_points()  # 寻找未连接满的顶点
-            live_pairs, all_points = find_live_pairs(live_points)  # 寻找可行的连接对
-            live_blocks = find_live_block(live_pairs, all_points)  # 寻找可行的超边
-            if live_blocks:                     # 有可行的超边
+            live_points = find_live_points()                        # 寻找未连接满的顶点
+            live_pairs, all_points = find_live_pairs(live_points)   # 寻找可行的连接对
+            live_blocks = find_live_block(live_pairs, all_points)   # 寻找可行的超边
+            if live_blocks:                         # 有可行的超边
                 new_edge_name = 'edge'+str(len(hyper_edge))
                 graph.add_node(new_edge_name)
                 hyper_edge.append(new_edge_name)
                 for i in live_blocks:
                     graph.add_edge(new_edge_name, i)
-            else:                               # 没有可行的超边
+            else:                                   # 没有可行的超边
                 switch_block(live_pairs, all_points)
             count+=1
-            if count==100:  # 防止死循环
+            if count==10000:  # 防止死循环
                 break
-
+        print("after", count, "times, mission completed.")
         self.graph = graph
 
     def draw(self):        
@@ -148,6 +148,6 @@ class STS():
 
 if __name__ == '__main__':
     random.seed(777)
-    v = 7
+    v = 9
     graph = STS(v, debug=False)
     graph.draw()
