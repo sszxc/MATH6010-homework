@@ -15,7 +15,7 @@ def draw_hypergraph(graph):
                         for node in list(graph.nodes)]
     sizes = [1000 if node[:4]=='node' else 50
                         for node in list(graph.nodes)]
-    label_dict = {node:node[4] if node[:4]=='node' else ''
+    label_dict = {node:node[4:] if node[:4]=='node' else ''
                         for node in list(graph.nodes)}
     nx.draw(graph,
         node_color=colors,
