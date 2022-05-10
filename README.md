@@ -58,4 +58,4 @@ Design a hill-climbing algorithm to construct random STS(v).
 
 ### Solution
 
-![result](hw3_SteinerTripleSystem/result.jpg)
+![result](hw3_STS/result.jpg)
