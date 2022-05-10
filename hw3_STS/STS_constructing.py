@@ -5,6 +5,7 @@
 import itertools
 import networkx as nx
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 from hypergraph import *
 
 class STS():
@@ -47,7 +48,7 @@ class STS():
                             if node[:4] == 'node']:  # 遍历所有节点
             graph.nodes[node]['neighbors'] = {node}  # 赋初始集合
 
-    def update_nodes_degree(self, graph):
+    def update_nodes_neighbor(self, graph):
         """
         遍历超边, 计算超图顶点的度
         n.b. 两条不同的超边连接A、B时, 节点度计算一次
@@ -71,6 +72,9 @@ class STS():
         self.graph_add_hyper_neighbors(graph)
 
         def find_live_points():
+            """
+            寻找度小于 (node_num-1)/2 的点
+            """
             live_points = []
             for node in hyper_node:
                 if len(graph.adj[node]) < (node_num-1)/2:
@@ -79,6 +83,9 @@ class STS():
             return live_points
 
         def find_live_pairs(live_points):
+            """
+            寻找live_points中未相互连接的点对
+            """
             live_pairs = []
             for p, q in list(itertools.combinations(live_points, 2)):
                 if q not in graph.nodes[p]['neighbors']:
@@ -107,7 +114,6 @@ class STS():
             return 0
         
         def switch_block(live_pairs, all_points):
-            print("switch_block")
             first_edge = random.choice(live_pairs)
             a, b = first_edge
             for c in all_points:
@@ -122,13 +128,29 @@ class STS():
                             graph.add_edge(edge, a)
                             print(l[0], b, c, "→", a, b, c)
                             return
+            a,b = b,a
+            for c in all_points:
+                if ((a,c) in live_pairs or (c,a) in live_pairs)\
+                    and b!=c:                               # 随意选择可行的 (a,b) 和 (a,c)
+                    for edge in hyper_edge:
+                        if b in list(graph.adj[edge]) and c in list(graph.adj[edge]):
+                            l = list(graph.adj[edge])
+                            l.remove(b)
+                            l.remove(c)                            
+                            graph.remove_edge(edge, l[0])   # 删除原来的(x,b,c), 添加 (a,b,c)
+                            graph.add_edge(edge, a)
+                            print(l[0], b, c, "→", a, b, c)
+                            return
+            print("FUCKED UP")
+
 
         target_edge_num = node_num*(node_num-1)/6
+        # tqdm_bar = tqdm(total=target_edge_num)  # 进度条控制
         print("target_edge_num", target_edge_num)
         count=0
         # 开始构造
         while len(hyper_edge) < target_edge_num:  # 最优条件
-            self.update_nodes_degree(graph)
+            self.update_nodes_neighbor(graph)
             live_points = find_live_points()                        # 寻找未连接满的顶点
             live_pairs, all_points = find_live_pairs(live_points)   # 寻找可行的连接对
             live_blocks = find_live_block(live_pairs, all_points)   # 寻找可行的超边
@@ -138,13 +160,17 @@ class STS():
                 hyper_edge.append(new_edge_name)
                 for i in live_blocks:
                     graph.add_edge(new_edge_name, i)
-                print(len(hyper_edge), "add edge")
+                
+                print(len(hyper_edge), "add edge ", end = "")
+                print("nei count:", len([n for node in hyper_node for n in graph.nodes[node]['neighbors'] ]))
+                # tqdm_bar.update(1)  # 进度条控制
             else:                                   # 没有可行的超边
                 switch_block(live_pairs, all_points)
                 print(len(hyper_edge), "trigger switch!")
             count+=1
             if count==2000:  # 防止死循环
                 break
+        # tqdm_bar.close()  # 进度条控制
         print("after", count, "times, mission completed.")
         self.graph = graph
 
