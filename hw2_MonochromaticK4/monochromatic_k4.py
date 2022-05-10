@@ -33,7 +33,7 @@ class MonochromaticK4():
 
     def find_K4(self):
         '''
-        寻找4顶点完全子图
+        寻找完全图的4顶点完全子图
         '''
         K4 = [c for c in itertools.combinations(list(self.graph.nodes), 4)]
         K4_dict = {}
