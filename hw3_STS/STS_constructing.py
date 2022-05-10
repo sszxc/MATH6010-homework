@@ -83,9 +83,9 @@ class STS():
             for p, q in list(itertools.combinations(live_points, 2)):
                 if q not in graph.nodes[p]['neighbors']:
                     live_pairs.append((p, q))
-            #TODO: ↓ 这一行需要一个更美写法 (拆开元组)
-            all_points = list(set([point[0] for point in live_pairs]
-                                + [point[1] for point in live_pairs]))
+            all_points = list(set([node for pair in live_pairs for node in pair]))  # 一种丧失了可读性的漂亮代码 和下一行等价                            
+            # all_points = list(set([point[0] for point in live_pairs]
+            #                     + [point[1] for point in live_pairs]))
             return live_pairs, all_points
 
         def find_live_block(live_pairs, all_points):
@@ -107,24 +107,27 @@ class STS():
             return 0
         
         def switch_block(live_pairs, all_points):
+            print("switch_block")
             first_edge = random.choice(live_pairs)
             a, b = first_edge
             for c in all_points:
                 if ((a,c) in live_pairs or (c,a) in live_pairs)\
                     and b!=c:                               # 随意选择可行的 (a,b) 和 (a,c)
-                    for edge in [node for node in list(graph.nodes)
-                            if node[:4] == 'edge']:
+                    for edge in hyper_edge:
                         if b in list(graph.adj[edge]) and c in list(graph.adj[edge]):
                             l = list(graph.adj[edge])
                             l.remove(b)
                             l.remove(c)                            
                             graph.remove_edge(edge, l[0])   # 删除原来的(x,b,c), 添加 (a,b,c)
                             graph.add_edge(edge, a)
+                            print(l[0], b, c, "→", a, b, c)
                             return
 
+        target_edge_num = node_num*(node_num-1)/6
+        print("target_edge_num", target_edge_num)
         count=0
         # 开始构造
-        while len(hyper_edge) < node_num*(node_num-1)/6:  # 最优条件
+        while len(hyper_edge) < target_edge_num:  # 最优条件
             self.update_nodes_degree(graph)
             live_points = find_live_points()                        # 寻找未连接满的顶点
             live_pairs, all_points = find_live_pairs(live_points)   # 寻找可行的连接对
@@ -135,10 +138,12 @@ class STS():
                 hyper_edge.append(new_edge_name)
                 for i in live_blocks:
                     graph.add_edge(new_edge_name, i)
+                print(len(hyper_edge), "add edge")
             else:                                   # 没有可行的超边
                 switch_block(live_pairs, all_points)
+                print(len(hyper_edge), "trigger switch!")
             count+=1
-            if count==10000:  # 防止死循环
+            if count==2000:  # 防止死循环
                 break
         print("after", count, "times, mission completed.")
         self.graph = graph
@@ -147,7 +152,7 @@ class STS():
         draw_hypergraph(self.graph)
 
 if __name__ == '__main__':
-    random.seed(777)
+    # random.seed(777)
     v = 9
     graph = STS(v, debug=False)
-    graph.draw()
+    # graph.draw()
