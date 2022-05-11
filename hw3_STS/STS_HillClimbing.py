@@ -108,7 +108,10 @@ class STS():
             无法新增的情况下进行随机替换
             """
             first_edge = random.choice(live_pairs)
-            a, b = first_edge  #TODO: 考虑是否要评估互换后的情况 a,b = b,a
+            if random.randint(0,1) == 0:  # 保证随机性, 注意下文ab并不等价
+                a, b = first_edge
+            else:
+                b, a = first_edge
             for c in all_points:
                 if ((a,c) in live_pairs or (c,a) in live_pairs)\
                     and b!=c:                               # 随意选择可行的 (a,b) 和 (a,c)
@@ -170,7 +173,7 @@ class STS():
         plt.show()
 
 if __name__ == '__main__':
-    # random.seed(777)
-    v = 13  # 31
-    graph = STS(v, monitor=True)
+    random.seed(777)
+    v = 31
+    graph = STS(v, monitor=False)
     graph.draw()
