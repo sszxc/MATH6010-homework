@@ -58,4 +58,4 @@ Task: Design a hill-climbing algorithm to construct random STS(v).
 
 ### Solution
 
-![result](hw3_STS/result_13.gif)
+![result](hw3_STS/result_9.gif)
