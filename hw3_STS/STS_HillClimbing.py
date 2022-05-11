@@ -6,75 +6,59 @@ import itertools
 import networkx as nx
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from hypergraph import *
+from hypergraph_visualization import *
 
 class STS():
-    def __init__(self, node_num, debug = False):
+    def __init__(self, node_num, monitor=False):
+        """
+        node_num: 节点数量
+        monitor: 是否开启实时渲染
+        """
+        self.monitor = monitor
         if node_num % 6 == 1 or node_num % 6 == 3:
-            if debug:
-                self.construct4debug()
-            else:
-                self.construct(node_num)
+            self.construct(node_num)
         else:
             raise ValueError("Wrong node number! v must satisfy v%6==1 or v%6==3.")
 
-    def construct4debug(self):
-        '''
-        构造一个一般的超图 用于debug
-        '''
-        node_num = 6
-        edge_num = 5
-        graph = nx.Graph()                  # 转换成 star expansion 形式
-        for i in range(node_num):           # 添加顶点
-            graph.add_node('node'+str(i))
-        for i in range(edge_num):           # 添加超边
-            graph.add_node('edge'+str(i))
-            for j in random.sample(range(node_num), 
-                        random.choice([3, 3, 4])):      # 随机构造超边, 随机连接顶点
-                graph.add_edge('edge'+str(i), 'node'+str(j))
-        
-        self.graph_add_hyper_neighbors(graph)
-        self.update_nodes_degree(graph)
-        self.graph = graph
-
-    def graph_add_hyper_neighbors(self, graph):
+    def graph_add_hyper_neighbors(self):
         """
         为超图中每个节点创建邻居集合 (点-边-点)
         集合中会包含节点自身, 计算度时注意 -1
-        注意在添加完所有顶点后执行
+        注意需要在添加完所有顶点后执行
         """
-        nx.set_node_attributes(graph, None, "neighbors")  #TODO: list 和 set 都需要单独赋值, dict 不用
-        for node in [node for node in list(graph.nodes)
+        nx.set_node_attributes(self.G, None, "neighbors")  #TODO: list 和 set 都需要单独赋值, dict 不用
+        for node in [node for node in list(self.G.nodes)
                             if node[:4] == 'node']:  # 遍历所有节点
-            graph.nodes[node]['neighbors'] = {node}  # 赋初始集合
+            self.G.nodes[node]['neighbors'] = {node}  # 赋初始集合
 
-    def update_nodes_neighbor(self, graph):
+    def update_nodes_neighbor(self):
         """
         遍历超边, 计算超图顶点的度
         n.b. 两条不同的超边连接A、B时, 节点度计算一次
         """
-        for node in [node for node in list(graph.nodes)
+        for node in [node for node in list(self.G.nodes)
                             if node[:4] == 'node']:  # 遍历所有节点
-            graph.nodes[node]['neighbors'] = {node}  # 清空邻居 (针对switch操作)
-        for hyper_edge in list(graph.nodes):
+            self.G.nodes[node]['neighbors'] = {node}  # 清空邻居 (针对switch操作)
+        for hyper_edge in list(self.G.nodes):
             if hyper_edge[:4] == 'edge':  # 遍历超边
-                connected_nodes = list(graph.adj[hyper_edge])  # 超边连接的所有点
+                connected_nodes = list(self.G.adj[hyper_edge])  # 超边连接的所有点
                 for i,j in list(itertools.permutations(connected_nodes, 2)):
-                    graph.nodes[i]['neighbors'].add(j)
+                    self.G.nodes[i]['neighbors'].add(j)
 
     def construct(self, node_num):
         '''
-        构造 STS(v)
+        爬山法构造 STS(v)
         '''
-        graph = nx.Graph()
+        self.G = nx.Graph()
         hyper_node = []  # 超图中的点
         hyper_edge = []  # 超图中的边
-        for i in range(node_num):
-            graph.add_node('node'+str(i))
+        for i in range(node_num):  # 创建所有节点
+            self.G.add_node('node'+str(i))
             hyper_node.append('node'+str(i))
-        self.graph_add_hyper_neighbors(graph)
+        self.graph_add_hyper_neighbors()
+        target_edge_num = node_num*(node_num-1)/6  # 最优条件
 
-        def find_live_points():
+        def find_live_points(graph):
             """
             寻找度小于 (node_num-1)/2 的点
             """
@@ -85,7 +69,7 @@ class STS():
                     live_points.append(node)
             return live_points
 
-        def find_live_pairs(live_points):
+        def find_live_pairs(graph, live_points):
             """
             寻找live_points中未相互连接的点对
             """
@@ -99,6 +83,9 @@ class STS():
             return live_pairs, all_points
 
         def find_live_block(live_pairs, all_points):
+            """
+            寻找live_pairs中可行的block
+            """
             # 当做图来处理, 寻找3-集团, 但效率非常低
             # G = nx.Graph()
             # G.add_edges_from(live_pairs)
@@ -116,7 +103,10 @@ class STS():
                 live_pairs_copy.remove(first_edge)
             return 0
         
-        def switch_block(live_pairs, all_points):
+        def switch_block(graph, live_pairs, all_points):
+            """
+            无法新增的情况下进行随机替换
+            """
             first_edge = random.choice(live_pairs)
             a, b = first_edge  #TODO: 考虑是否要评估互换后的情况 a,b = b,a
             for c in all_points:
@@ -131,38 +121,56 @@ class STS():
                             graph.add_edge(edge, a)
                             # print(l[0], b, c, "→", a, b, c)
                             return
-            print("FUCKED UP")
+            print("FUCKED UP")  # 一般是出问题了
 
 
-        target_edge_num = node_num*(node_num-1)/6
+
+        # 开始构造        
         tqdm_bar = tqdm(total=target_edge_num)  # 进度条控制
-        count=0
-        # 开始构造
-        while len(hyper_edge) < target_edge_num:  # 最优条件
-            self.update_nodes_neighbor(graph)
-            live_points = find_live_points()                        # 寻找未连接满的顶点
-            live_pairs, all_points = find_live_pairs(live_points)   # 寻找可行的连接对
+        if self.monitor:
+            self.hyper_node_layout = nx.circular_layout(self.G)  # 超图节点环形分布
+            fig = plt.figure()  # 生成画布
+            plt.ion()  # 打开交互模式
+        while len(hyper_edge) < target_edge_num:
+            self.update_nodes_neighbor()
+            live_points = find_live_points(self.G)                        # 寻找未连接满的顶点
+            live_pairs, all_points = find_live_pairs(self.G, live_points)   # 寻找可行的连接对
             live_blocks = find_live_block(live_pairs, all_points)   # 寻找可行的超边
             if live_blocks:                             # 有可行的超边
                 new_edge_name = 'edge'+str(len(hyper_edge))
-                graph.add_node(new_edge_name)           # 新增超边
+                self.G.add_node(new_edge_name)           # 新增超边
                 hyper_edge.append(new_edge_name)
                 for i in live_blocks:
-                    graph.add_edge(new_edge_name, i)    # 连接所有顶点
+                    self.G.add_edge(new_edge_name, i)    # 连接所有顶点
                 tqdm_bar.update(1)  # 进度条控制
             else:                                       # 没有可行的超边
-                switch_block(live_pairs, all_points)
-            count+=1
-            if count==2000:  # 防止死循环
-                break
+                switch_block(self.G, live_pairs, all_points)
+            if self.monitor:
+                fig.clf()
+                self.update_gif(hyper_node, self.hyper_node_layout)
+                plt.pause(0.01)
+        # 完成构造
         tqdm_bar.close()  # 进度条控制
-        self.graph = graph
+        if self.monitor:
+            plt.ioff()  # 关闭交互模式
+            plt.show()
 
-    def draw(self):        
-        draw_hypergraph(self.graph)
+    def update_gif(self, node, node_pos):
+        """
+        更新构建过程截图 节点为固定位置
+        """
+        draw_hypergraph(self.G, fixed_node=(node, node_pos))
+
+    def draw(self):
+        """
+        绘制图形 节点随机分布
+        """
+        fig, ax = plt.subplots()
+        draw_hypergraph(self.G)
+        plt.show()
 
 if __name__ == '__main__':
-    random.seed(777)
-    v = 21
-    graph = STS(v, debug=False)
+    # random.seed(777)
+    v = 13  # 31
+    graph = STS(v, monitor=True)
     graph.draw()
