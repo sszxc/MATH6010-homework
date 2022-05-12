@@ -1,4 +1,4 @@
-# Author: Kang Chen
+# Author: Ckzzz1
 # Date: May 11th, 2022
 # Description: Steepest Ascent for uniform graph partition
 
@@ -55,7 +55,7 @@ class UGP():
 
 
 if __name__ == '__main__':
-    nodes = 500
+    nodes = 100
     t1 = time.time()
     graph = UGP(nodes)
     n1, n2, cost, x, cost_list = graph.steepest_ascent()
