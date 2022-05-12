@@ -9,14 +9,16 @@ from tqdm import tqdm
 from hypergraph_visualization import *
 
 class STS():
-    def __init__(self, node_num, monitor=False):
+    def __init__(self, node_num, tqdm_bar=True, monitor=False):
         """
         node_num: 节点数量
         monitor: 是否开启实时渲染
         """
+        self.tqdm_bar = tqdm_bar
         self.monitor = monitor
         if node_num % 6 == 1 or node_num % 6 == 3:
-            self.construct(node_num)
+            self.n = node_num
+            self.construct()
         else:
             raise ValueError("Wrong node number! v must satisfy v%6==1 or v%6==3.")
 
@@ -45,18 +47,19 @@ class STS():
                 for i,j in list(itertools.permutations(connected_nodes, 2)):
                     self.G.nodes[i]['neighbors'].add(j)
 
-    def construct(self, node_num):
+    def construct(self):
         '''
         爬山法构造 STS(v)
         '''
         self.G = nx.Graph()
         hyper_node = []  # 超图中的点
         hyper_edge = []  # 超图中的边
-        for i in range(node_num):  # 创建所有节点
+        for i in range(self.n):  # 创建所有节点
             self.G.add_node('node'+str(i))
             hyper_node.append('node'+str(i))
         self.graph_add_hyper_neighbors()
-        target_edge_num = node_num*(node_num-1)/6  # 最优条件
+        edge_num_target = self.n*(self.n-1)/6  # 最优条件
+        self.edge_num_history = []  # 记录每次循环后超边数量
 
         def find_live_points(graph):
             """
@@ -64,8 +67,8 @@ class STS():
             """
             live_points = []
             for node in hyper_node:
-                if len(graph.adj[node]) < (node_num-1)/2:
-                # if len(graph.nodes[node]['neighbors'])-1 < node_num-1:  # 两种写法等价
+                if len(graph.adj[node]) < (self.n-1)/2:
+                # if len(graph.nodes[node]['neighbors'])-1 < self.n-1:  # 两种写法等价
                     live_points.append(node)
             return live_points
 
@@ -128,13 +131,14 @@ class STS():
 
 
 
-        # 开始构造        
-        tqdm_bar = tqdm(total=target_edge_num)  # 进度条控制
+        # 开始构造
+        if self.tqdm_bar:
+            tqdm_bar = tqdm(total=edge_num_target)  # 进度条控制
         if self.monitor:
             self.hyper_node_layout = nx.circular_layout(self.G)  # 超图节点环形分布
             fig = plt.figure()  # 生成画布
             plt.ion()  # 打开交互模式
-        while len(hyper_edge) < target_edge_num:
+        while len(hyper_edge) < edge_num_target:
             self.update_nodes_neighbor()
             live_points = find_live_points(self.G)                        # 寻找未连接满的顶点
             live_pairs, all_points = find_live_pairs(self.G, live_points)   # 寻找可行的连接对
@@ -145,35 +149,49 @@ class STS():
                 hyper_edge.append(new_edge_name)
                 for i in live_blocks:
                     self.G.add_edge(new_edge_name, i)    # 连接所有顶点
-                tqdm_bar.update(1)  # 进度条控制
+                if self.tqdm_bar:
+                    tqdm_bar.update(1)  # 进度条控制
             else:                                       # 没有可行的超边
                 switch_block(self.G, live_pairs, all_points)
             if self.monitor:
                 fig.clf()
                 self.update_gif(hyper_node, self.hyper_node_layout)
                 plt.pause(0.01)
+            self.edge_num_history.append(len(hyper_edge))  # 记录每次循环后超边数量
         # 完成构造
-        tqdm_bar.close()  # 进度条控制
+        if self.tqdm_bar:
+            tqdm_bar.close()  # 进度条控制
         if self.monitor:
             plt.ioff()  # 关闭交互模式
             plt.show()
 
     def update_gif(self, node, node_pos):
         """
-        更新构建过程截图 节点为固定位置
+        更新构建过程截图 节点固定位置 超边随机分布
         """
         draw_hypergraph(self.G, fixed_node=(node, node_pos))
 
     def draw(self):
         """
-        绘制图形 节点随机分布
+        绘制图形 节点、超边随机分布
         """
         fig, ax = plt.subplots()
         draw_hypergraph(self.G)
         plt.show()
 
+    def draw_history(self):
+        """
+        绘制构造历史记录
+        """
+        plt.plot(self.edge_num_history, '-')
+        plt.xlabel('Steps')
+        plt.ylabel('NumBlocks')
+        plt.title(r'$\bf{Hill-Climbing\ Algorithm\ to\ construct\ STS(v)}$' + f'\nv = {self.n}')
+        plt.show()
+
 if __name__ == '__main__':
     random.seed(777)
-    v = 31
+    v = 43  # 13 61
     graph = STS(v, monitor=False)
-    graph.draw()
+    # graph.draw()
+    graph.draw_history()
