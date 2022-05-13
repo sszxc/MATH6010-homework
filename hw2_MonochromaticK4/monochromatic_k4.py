@@ -100,12 +100,15 @@ class MonochromaticK4():
         画图, 同时给边染上不同颜色
         '''
         fig, ax = plt.subplots()
-        colors = ["grey" if self.graph[e1][e2]['color'] == "white" else "black"
+        colors = ["orangered" if self.graph[e1][e2]['color'] == "white" else "royalblue"
                   for e1, e2 in self.graph.edges]
         nx.draw(self.graph,
+                nx.circular_layout(self.graph),
                 edge_color=colors,
-                width=3,
-                node_color="lightblue",
+                width=2,
+                node_color="lightgray",
+                edgecolors="black",
+                linewidths=2,
                 node_size=1000,
                 with_labels=True,
                 font_weight='bold')
@@ -144,7 +147,7 @@ if __name__ == '__main__':
     print("------------------------------------------------")
 
     random.seed(777)
-    node = 50  # 生成顶点数
+    node = 10  # 生成顶点数
     MK4 = MonochromaticK4(node)
 
     MK4.coloring()
