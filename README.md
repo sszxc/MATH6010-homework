@@ -30,13 +30,15 @@ Task: Design a greedy algorithm to find a dominating set that satisfies the theo
 python hw1_MinDomSet\min_dom_set.py
 ```
 
+For example, the following is a solution for a given graph, which satisfies the theorem.
+
 ![result](hw1_MinDomSet/result.jpg)
 
 ## Homework 2: Monochromatic K4
 
 Definition: $K_n$ is a complete graph (a clique) with $n$ nodes.
 
-Theorem: There is a two-coloring of $K_n$ with at most $C_n^4 2^{-5}$ monochromatic K4.
+Theorem: There is a two-coloring of $K_n$ with at most $C_n^4 2^{-5}$ monochromatic $K_4$.
 
 Task: Design an algorithm based on derandomization to find a method of coloring the edges that satisfies the theorem.
 
@@ -47,6 +49,8 @@ python hw2_MonochromaticK4\monochromatic_k4.py
 ```
 
 The algorithm is specially optimized to take only 23 seconds for a problem of 100 vertices.
+
+For example, the following is a two-coloring solution for $K_{10}$. It has zero $K_4$ which is below the theoretical bound 6.56.
 
 ![result](hw2_MonochromaticK4/result.jpg)
 
@@ -62,6 +66,8 @@ Task: Design an algorithm based on simulated annealing to solve the 0-1 knapsack
 python hw3_knapsack\SimulatedAnnealing.py
 ```
 
+For example, the following is the solving process for a given knapsack problem.
+
 ![result](hw3_knapsack/result.jpg)
 
 ## Homework 3: Steiner Triple Systems
@@ -75,5 +81,7 @@ Task: Design a hill-climbing algorithm to construct random STS(v).
 ```python
 python hw3_STS\STS_HillClimbing.py
 ```
+
+For example, the following gif is the solving process for STS(9).
 
 ![result](hw3_STS/result_9.gif)
