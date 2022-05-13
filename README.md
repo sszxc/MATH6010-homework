@@ -50,6 +50,20 @@ The algorithm is specially optimized to take only 23 seconds for a problem of 10
 
 ![result](hw2_MonochromaticK4/result.jpg)
 
+## Homework 3: 0-1 Knapsack problem
+
+Given weights and values of n items, put these items in a knapsack of capacity W to get the maximum total value in the knapsack. 
+
+Task: Design an algorithm based on simulated annealing to solve the 0-1 knapsack problem.
+
+### Solution
+
+```python
+python hw3_knapsack\SimulatedAnnealing.py
+```
+
+![result](hw3_knapsack/result.jpg)
+
 ## Homework 3: Steiner Triple Systems
 
 Definition: A Steiner triple system is a set system $(V,B)$ in which every block has size three, and every pair of points from $V$ is contained in a unique block. If $|V| =v$, then we denote such a system as an STS(v).
@@ -57,5 +71,9 @@ Definition: A Steiner triple system is a set system $(V,B)$ in which every block
 Task: Design a hill-climbing algorithm to construct random STS(v).
 
 ### Solution
+
+```python
+python hw3_STS\STS_HillClimbing.py
+```
 
 ![result](hw3_STS/result_9.gif)
