@@ -27,7 +27,7 @@ def print_table(weight_profit):
     print(x)
 
 class SimulatedAnnealing:
-    def __init__(self, capacity, weight_profit, temperature = 1000, cooling_rate = 0.996, max_iterations = 1000):
+    def __init__(self, capacity, weight_profit, temperature = 1000, cooling_rate = 0.995, max_iterations = 1000):
         self.capacity = capacity
         self.weight_profit = weight_profit
         self.temperature = temperature
@@ -109,7 +109,8 @@ class SimulatedAnnealing:
         """
         绘制历史数据
         """
-        plt.title(r'$\bf{Knapsack\ Problem}$'+'\nSimulated Annealing Algorithm')
+        plt.title(r'$\bf{Knapsack\ Problem}$'+'\nSimulated Annealing Algorithm, '
+                + r'$\alpha=$' + str(self.cooling_rate))
         plt.xlabel('Iteration')
         plt.ylabel('Value')
         plt.plot(self.history)
