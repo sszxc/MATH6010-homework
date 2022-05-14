@@ -1,18 +1,18 @@
-# MATH6010-homework
+# MATH6010-homework<!-- omit in toc -->
 
+- [Dependency](#dependency)
+- [Homework 1: Minimum Dominating Set](#homework-1-minimum-dominating-set)
+  - [Solution](#solution)
+- [Homework 2: Monochromatic K4](#homework-2-monochromatic-k4)
+  - [Solution](#solution-1)
+- [Homework 3: 0-1 Knapsack problem](#homework-3-0-1-knapsack-problem)
+  - [Solution](#solution-2)
+- [Homework 3: Steiner Triple Systems](#homework-3-steiner-triple-systems)
+  - [Solution](#solution-3)
+- [Homework 3: Uniform Graph Partition](#homework-3-uniform-graph-partition)
+  - [Solution](#solution-4)
 
-  - [Dependency](#dependency)
-  - [Homework 1: Minimum Dominating Set](#homework-1-minimum-dominating-set)
-    - [Solution](#solution)
-  - [Homework 2: Monochromatic K4](#homework-2-monochromatic-k4)
-    - [Solution](#solution-1)
-  - [Homework 3: 0-1 Knapsack problem](#homework-3-0-1-knapsack-problem)
-    - [Solution](#solution-2)
-  - [Homework 3: Steiner Triple Systems](#homework-3-steiner-triple-systems)
-    - [Solution](#solution-3)
-  - [Homework 3: Uniform Graph Partition](#homework-3-uniform-graph-partition)
-    - [Solution](#solution-4)
-
+---
 
 This repo contains my assignments for MATH6010 (2022 spring) at SJTU.
 
@@ -106,7 +106,7 @@ For example, the following gif is the solving process for STS(9). Here, the STS 
 
 ## Homework 3: Uniform Graph Partition
 
-[TBD]
+Define a complete graph on $2n$ vertices; a cost function $E \to Z^+ \cup \{0\}$. Try to find the minimum value of $c([X_0,X_1])=\sum_{\{u,v\}\in E, u\in X_0, v\in X_1}\cos t(u,v)$ subject to $V=X_0\cup X_1$ and $|X_0|=|X_1|=n$.
 ### Solution
 
 ```python
