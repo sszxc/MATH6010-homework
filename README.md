@@ -1,5 +1,21 @@
 # MATH6010-homework
 
+
+  - [Dependency](#dependency)
+  - [Homework 1: Minimum Dominating Set](#homework-1-minimum-dominating-set)
+    - [Solution](#solution)
+  - [Homework 2: Monochromatic K4](#homework-2-monochromatic-k4)
+    - [Solution](#solution-1)
+  - [Homework 3: 0-1 Knapsack problem](#homework-3-0-1-knapsack-problem)
+    - [Solution](#solution-2)
+  - [Homework 3: Steiner Triple Systems](#homework-3-steiner-triple-systems)
+    - [Solution](#solution-3)
+  - [Homework 3: Uniform Graph Partition](#homework-3-uniform-graph-partition)
+    - [Solution](#solution-4)
+
+
+This repo contains my assignments for MATH6010 (2022 spring) at SJTU.
+
 Follow the commands below to start.
 
 ```shell
@@ -7,6 +23,7 @@ git clone https://github.com/sszxc/MATH6010-homework.git
 cd MATH6010-homework/
 python -m pip install -r requirements.txt
 ```
+
 ## Dependency
 
 [NetworkX](https://networkx.org/) for
@@ -85,3 +102,13 @@ python hw3_STS\STS_HillClimbing.py
 For example, the following gif is the solving process for STS(9).
 
 ![result](hw3_STS/result_9.gif)
+
+
+## Homework 3: Uniform Graph Partition
+
+[TBD]
+### Solution
+
+```python
+python hw3_UniformGraphPartition\UniformGraphPartition.py
+```
