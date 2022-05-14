@@ -99,7 +99,7 @@ Task: Design a hill-climbing algorithm to construct random STS(v).
 python hw3_STS\STS_HillClimbing.py
 ```
 
-For example, the following gif is the solving process for STS(9).
+For example, the following gif is the solving process for STS(9). Here, the STS is presented as a hypergraph: the big green circles are the points, and the small gray circles are the blocks that connect three points.
 
 ![result](hw3_STS/result_9.gif)
 
